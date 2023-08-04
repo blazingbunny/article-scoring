@@ -47,4 +47,8 @@ st.title('SEO Keyword Distribution Scorer')
 url = st.text_input('Enter a URL', '')
 if url:
     scores = score_keyword_distribution(url)
-    st.text(scores)
+    output = ""
+    for parent_tag, parent_text, child_tag, child_text, score in scores:
+        indent = "    " * (int(child_tag[1]) - 1)
+        output += f"{indent}- **{child_tag} ({child_text})**: {score:.2f} (relevancy to {parent_tag} '{parent_text}')\n"
+    st.markdown(output)
