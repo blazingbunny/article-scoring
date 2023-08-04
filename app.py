@@ -39,8 +39,9 @@ def score_keyword_distribution(url):
             scores.append((last_heading[level-1][0], last_heading[level-1][1], headings[i][0], headings[i][1], score))
         last_heading[level] = headings[i]
     for i in range(len(paragraphs)):  # Level for paragraphs
-        score = calculate_similarity(last_heading[5][1], paragraphs[i][1])  # Compare paragraph with last h6 heading
-        scores.append((last_heading[5][0], last_heading[5][1], paragraphs[i][0], paragraphs[i][1], score))
+        if last_heading[5] is not None:  # Check if there is a valid last h6 heading
+            score = calculate_similarity(last_heading[5][1], paragraphs[i][1])  # Compare paragraph with last h6 heading
+            scores.append((last_heading[5][0], last_heading[5][1], paragraphs[i][0], paragraphs[i][1], score))
     print(f"Scores: {scores}")  # Debug print
     return scores
 
