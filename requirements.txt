@@ -1,0 +1,5 @@
+beautifulsoup4
+streamlit
+sklearn
+numpy
+scipy
