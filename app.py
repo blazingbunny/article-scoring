@@ -50,9 +50,11 @@ if url:
     output = ""
 
     # Find h1 tag and add it to the output
-    h1_tag = [tag for tag in scores if tag[0] == 'h1']
+    html = get_html(url)
+    soup = BeautifulSoup(html, 'html.parser')
+    h1_tag = soup.find('h1')
     if h1_tag:
-        output += f"**{h1_tag[0][0]} ({h1_tag[0][1]})**\n\n"
+        output += f"**{h1_tag.name} ({h1_tag.get_text(strip=True)})**\n\n"
 
     for parent_tag, parent_text, child_tag, child_text, score in scores:
         indent = "    " * (int(child_tag[1]) - 1)
