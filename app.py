@@ -42,22 +42,16 @@ def score_keyword_distribution(url):
     print(f"Scores: {scores}")  # Debug print
     return scores
 
+import pandas as pd
+
 # Streamlit code
 st.title('SEO Keyword Distribution Scorer')
 url = st.text_input('Enter a URL', '')
 if url:
     scores = score_keyword_distribution(url)
-    output = ""
 
-    # Find h1 tag and add it to the output
-    html = get_html(url)
-    soup = BeautifulSoup(html, 'html.parser')
-    h1_tag = soup.find('h1')
-    if h1_tag:
-        output += f"**{h1_tag.name} ({h1_tag.get_text(strip=True)})**\n\n"
+    # Convert scores to a DataFrame
+    df_scores = pd.DataFrame(scores, columns=['Parent Tag', 'Parent Text', 'Child Tag', 'Child Text', 'Score'])
 
-    for parent_tag, parent_text, child_tag, child_text, score in scores:
-        indent = "    " * (int(child_tag[1]) - 1)
-        output += f"{indent}- **{child_tag} ({child_text})**: {score:.2f} (relevancy to {parent_tag} '{parent_text}')\n"
-    st.markdown(output)
-
+    # Display the DataFrame as a table
+    st.table(df_scores)
