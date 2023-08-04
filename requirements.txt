@@ -3,3 +3,5 @@ streamlit
 sklearn
 numpy
 scipy
+requests
+scikit-learn
