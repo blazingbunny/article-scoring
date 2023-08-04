@@ -48,7 +48,14 @@ url = st.text_input('Enter a URL', '')
 if url:
     scores = score_keyword_distribution(url)
     output = ""
+
+    # Find h1 tag and add it to the output
+    h1_tag = [tag for tag in scores if tag[0] == 'h1']
+    if h1_tag:
+        output += f"**{h1_tag[0][0]} ({h1_tag[0][1]})**\n\n"
+
     for parent_tag, parent_text, child_tag, child_text, score in scores:
         indent = "    " * (int(child_tag[1]) - 1)
         output += f"{indent}- **{child_tag} ({child_text})**: {score:.2f} (relevancy to {parent_tag} '{parent_text}')\n"
     st.markdown(output)
+
