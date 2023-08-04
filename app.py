@@ -18,15 +18,18 @@ def get_tag_contents(html, tag):
 
 def calculate_similarity(texts):
     """Return the average cosine similarity of the given texts."""
-    vectorizer = TfidfVectorizer().fit_transform(texts)
-    pairwise_similarity = cosine_similarity(vectorizer)
-    return pairwise_similarity.mean()
+    if texts and any(t.strip() for t in texts):  # Check if texts is not empty and contains more than just whitespace
+        vectorizer = TfidfVectorizer().fit_transform(texts)
+        pairwise_similarity = cosine_similarity(vectorizer)
+        return pairwise_similarity.mean()
+    else:
+        return 0
 
 def score_keyword_distribution(url):
     """Return the relevancy scores of the h-tags in the HTML of the given URL."""
     html = get_html(url)
     soup = BeautifulSoup(html, 'html.parser')
-    headings = [('h1', tag.get_text()) for tag in soup.find_all(['h1', 'h2', 'h3', 'h4', 'h5', 'h6'])]
+    headings = [(tag.name, tag.get_text()) for tag in soup.find_all(['h1', 'h2', 'h3', 'h4', 'h5', 'h6'])]
     print(f"Headings: {headings}")  # Debug print
     scores = []
     for i in range(1, len(headings)):
@@ -35,18 +38,6 @@ def score_keyword_distribution(url):
             scores.append((headings[i-1][0], headings[i-1][1], headings[i][0], headings[i][1], score))
     print(f"Scores: {scores}")  # Debug print
     return scores
-
-    
-def calculate_similarity(texts):
-    """Return the average cosine similarity of the given texts."""
-    if texts and any(t.strip() for t in texts):  # Check if texts is not empty and contains more than just whitespace
-        vectorizer = TfidfVectorizer().fit_transform(texts)
-        pairwise_similarity = cosine_similarity(vectorizer)
-        return pairwise_similarity.mean()
-    else:
-        return 0
-
-
 
 # Streamlit code
 st.title('SEO Keyword Distribution Scorer')
