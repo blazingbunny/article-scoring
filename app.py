@@ -16,33 +16,34 @@ def get_tag_contents(html, tag):
     soup = BeautifulSoup(html, 'html.parser')
     return [tag.get_text() for tag in soup.find_all(tag)]
 
-def calculate_similarity(texts):
-    """Return the average cosine similarity of the given texts."""
-    if texts and any(t.strip() for t in texts):  # Check if texts is not empty and contains more than just whitespace
-        vectorizer = TfidfVectorizer().fit_transform(texts)
-        pairwise_similarity = cosine_similarity(vectorizer)
-        return pairwise_similarity.mean()
-    else:
-        return 0
+def calculate_similarity(text1, text2):
+    """Return whether text2 contains any of the words from text1."""
+    text1_words = set(text1.lower().split())
+    text2_words = set(text2.lower().split())
+    common_words = text1_words & text2_words
+    return len(common_words) / len(text1_words)
 
 def score_keyword_distribution(url):
     """Return the relevancy scores of the h-tags and p-tags in the HTML of the given URL."""
     html = get_html(url)
     soup = BeautifulSoup(html, 'html.parser')
     headings = [(tag.name, tag.get_text(strip=True)) for tag in soup.find_all(['h1', 'h2', 'h3', 'h4', 'h5', 'h6'])]
-    p_text = ' '.join([tag.get_text(strip=True) for tag in soup.find_all('p')])  # Combine all the p tag texts into one string
-    headings.append(('p', p_text))  # Add the p text as the last element of headings
+    paragraphs = [(tag.name, tag.get_text(strip=True)) for tag in soup.find_all('p')]
     print(f"Headings: {headings}")  # Debug print
     scores = []
     last_heading = [None, None, None, None, None, None]
     for i in range(len(headings)):
-        level = int(headings[i][0][1]) - 1 if headings[i][0] != 'p' else 0  # Set level to 0 for p tags
+        level = int(headings[i][0][1]) - 1  # Level for headings
         if level > 0 and last_heading[level-1] is not None:
-            score = calculate_similarity([last_heading[level-1][1], headings[i][1]])
+            score = calculate_similarity(last_heading[level-1][1], headings[i][1])
             scores.append((last_heading[level-1][0], last_heading[level-1][1], headings[i][0], headings[i][1], score))
         last_heading[level] = headings[i]
+    for i in range(len(paragraphs)):  # Level for paragraphs
+        score = calculate_similarity(last_heading[5][1], paragraphs[i][1])  # Compare paragraph with last h6 heading
+        scores.append((last_heading[5][0], last_heading[5][1], paragraphs[i][0], paragraphs[i][1], score))
     print(f"Scores: {scores}")  # Debug print
     return scores
+
 
 
 import pandas as pd
