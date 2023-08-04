@@ -29,13 +29,16 @@ def score_keyword_distribution(url):
     """Return the relevancy scores of the h-tags in the HTML of the given URL."""
     html = get_html(url)
     soup = BeautifulSoup(html, 'html.parser')
-    headings = [(tag.name, tag.get_text()) for tag in soup.find_all(['h1', 'h2', 'h3', 'h4', 'h5', 'h6'])]
+    headings = [(tag.name, tag.get_text(strip=True)) for tag in soup.find_all(['h1', 'h2', 'h3', 'h4', 'h5', 'h6'])]
     print(f"Headings: {headings}")  # Debug print
     scores = []
-    for i in range(1, len(headings)):
-        if int(headings[i][0][1]) > int(headings[i-1][0][1]):
-            score = calculate_similarity([headings[i-1][1], headings[i][1]])
-            scores.append((headings[i-1][0], headings[i-1][1], headings[i][0], headings[i][1], score))
+    last_heading = [None, None, None, None, None, None]
+    for i in range(len(headings)):
+        level = int(headings[i][0][1]) - 1
+        if level > 0 and last_heading[level-1] is not None:
+            score = calculate_similarity([last_heading[level-1][1], headings[i][1]])
+            scores.append((last_heading[level-1][0], last_heading[level-1][1], headings[i][0], headings[i][1], score))
+        last_heading[level] = headings[i]
     print(f"Scores: {scores}")  # Debug print
     return scores
 
