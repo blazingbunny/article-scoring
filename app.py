@@ -29,6 +29,27 @@ def score_keyword_distribution(url):
         contents = get_tag_contents(html, tag)
         scores[tag] = calculate_similarity(contents)
     return scores
+    
+def calculate_similarity(texts):
+    """Return the average cosine similarity of the given texts."""
+    if texts:
+        vectorizer = TfidfVectorizer().fit_transform(texts)
+        pairwise_similarity = cosine_similarity(vectorizer)
+        return pairwise_similarity.mean()
+    else:
+        return 0
+
+def score_keyword_distribution(url):
+    """Return the relevancy scores of the h-tags in the HTML of the given URL."""
+    html = get_html(url)
+    scores = {}
+    for tag in ['h1', 'h2', 'h3', 'h4', 'h5', 'h6']:
+        contents = get_tag_contents(html, tag)
+        if contents:  # check if contents is not empty
+            scores[tag] = calculate_similarity(contents)
+        else:
+            scores[tag] = 0  # assign default score if contents is empty
+    return scores
 
 # Streamlit code
 st.title('SEO Keyword Distribution Scorer')
