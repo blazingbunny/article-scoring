@@ -1,7 +1,4 @@
-beautifulsoup4
 streamlit
-sklearn
-numpy
-scipy
+beautifulsoup4
 requests
 scikit-learn
