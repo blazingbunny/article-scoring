@@ -32,12 +32,13 @@ def score_keyword_distribution(url):
     
 def calculate_similarity(texts):
     """Return the average cosine similarity of the given texts."""
-    if texts:
+    if texts and any(t.strip() for t in texts):  # Check if texts is not empty and contains more than just whitespace
         vectorizer = TfidfVectorizer().fit_transform(texts)
         pairwise_similarity = cosine_similarity(vectorizer)
         return pairwise_similarity.mean()
     else:
         return 0
+
 
 def score_keyword_distribution(url):
     """Return the relevancy scores of the h-tags in the HTML of the given URL."""
