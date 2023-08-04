@@ -27,12 +27,15 @@ def score_keyword_distribution(url):
     html = get_html(url)
     soup = BeautifulSoup(html, 'html.parser')
     headings = [('h1', tag.get_text()) for tag in soup.find_all(['h1', 'h2', 'h3', 'h4', 'h5', 'h6'])]
+    print(f"Headings: {headings}")  # Debug print
     scores = []
     for i in range(1, len(headings)):
         if int(headings[i][0][1]) > int(headings[i-1][0][1]):
             score = calculate_similarity([headings[i-1][1], headings[i][1]])
             scores.append((headings[i-1][0], headings[i-1][1], headings[i][0], headings[i][1], score))
+    print(f"Scores: {scores}")  # Debug print
     return scores
+
     
 def calculate_similarity(texts):
     """Return the average cosine similarity of the given texts."""
@@ -50,4 +53,4 @@ st.title('SEO Keyword Distribution Scorer')
 url = st.text_input('Enter a URL', '')
 if url:
     scores = score_keyword_distribution(url)
-    st.write(scores)
+    st.text(scores)
