@@ -26,21 +26,24 @@ def calculate_similarity(texts):
         return 0
 
 def score_keyword_distribution(url):
-    """Return the relevancy scores of the h-tags in the HTML of the given URL."""
+    """Return the relevancy scores of the h-tags and p-tags in the HTML of the given URL."""
     html = get_html(url)
     soup = BeautifulSoup(html, 'html.parser')
     headings = [(tag.name, tag.get_text(strip=True)) for tag in soup.find_all(['h1', 'h2', 'h3', 'h4', 'h5', 'h6'])]
+    p_text = ' '.join([tag.get_text(strip=True) for tag in soup.find_all('p')])  # Combine all the p tag texts into one string
+    headings.append(('p', p_text))  # Add the p text as the last element of headings
     print(f"Headings: {headings}")  # Debug print
     scores = []
     last_heading = [None, None, None, None, None, None]
     for i in range(len(headings)):
-        level = int(headings[i][0][1]) - 1
+        level = int(headings[i][0][1]) - 1 if headings[i][0] != 'p' else 0  # Set level to 0 for p tags
         if level > 0 and last_heading[level-1] is not None:
             score = calculate_similarity([last_heading[level-1][1], headings[i][1]])
             scores.append((last_heading[level-1][0], last_heading[level-1][1], headings[i][0], headings[i][1], score))
         last_heading[level] = headings[i]
     print(f"Scores: {scores}")  # Debug print
     return scores
+
 
 import pandas as pd
 
